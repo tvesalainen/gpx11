@@ -101,6 +101,45 @@ public class GPX
             throw new IOException(ex);
         }
     }
+    public void browse(double bearingTolerance, double minDistance, final TrackHandler handler)
+    {
+        JAXBElement<GpxType> gpx1 = getGpx();
+        GpxType gpxType = gpx1.getValue();
+        List<TrkType> trkList = gpxType.getTrk();
+        for (TrkType trk : trkList)
+        {
+            ExtensionsType extensions = trk.getExtensions();
+            boolean cont = handler.startTrack(extensions.getAny());
+            if (cont)
+            {
+                List<TrksegType> trksegList = trk.getTrkseg();
+                for (TrksegType tt : trksegList)
+                {
+                    handler.startTrackSeq();
+                    WaypointFilter filter = new WaypointFilter(bearingTolerance, minDistance)
+                    {
+                        @Override
+                        protected void output(WptType wt)
+                        {
+                            handler.trackPoint(
+                                    wt.getLat().doubleValue(), 
+                                    wt.getLon().doubleValue(), 
+                                    wt.getTime().toGregorianCalendar().getTimeInMillis()
+                                    );
+                        }
+                    };
+
+                    List<WptType> trkptList = tt.getTrkpt();
+                    for (WptType wt : trkptList)
+                    {
+                        filter.input(wt);
+                    }
+                    handler.endTrackSeq();
+                }
+            }
+            handler.endTrack();
+        }
+    }
     public static String getText(ExtensionsType extensions, String namespaceURI, String localname)
     {
         for (Object ob : extensions.getAny())
