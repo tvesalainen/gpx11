@@ -108,8 +108,9 @@ public class GPX
         List<TrkType> trkList = gpxType.getTrk();
         for (TrkType trk : trkList)
         {
+            String name = trk.getName();
             ExtensionsType extensions = trk.getExtensions();
-            boolean cont = handler.startTrack(extensions.getAny());
+            boolean cont = handler.startTrack(name, extensions.getAny());
             if (cont)
             {
                 List<TrksegType> trksegList = trk.getTrkseg();

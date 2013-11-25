@@ -17,7 +17,7 @@ public interface TrackHandler
      * @param extensions
      * @return 
      */
-    boolean startTrack(Collection<Object> extensions);
+    boolean startTrack(String name, Collection<Object> extensions);
     void endTrack();
     void startTrackSeq();
     void endTrackSeq();
