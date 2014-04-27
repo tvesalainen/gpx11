@@ -1,13 +1,38 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>    
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.vesalainen.mailblog</groupId>
+    <groupId>org.vesalainen.gpx</groupId>
     <artifactId>GPX</artifactId>
     <version>1.1</version>
     <packaging>jar</packaging>
 
-    <name>GPX</name>
-    <url>http://maven.apache.org</url>
+    <name>GPX Helper Library</name>
+    <description>GPX Helper Library</description>
+    <url>https://github.com/tvesalainen/${project.artifactId}</url>
+    <licenses>
+        <license>
+            <name>GNU General Public License, Version 3.0</name>
+            <url>http://www.gnu.org/licenses</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:git://github.com/tvesalainen/${project.artifactId}</connection>
+        <developerConnection>scm:git:git://github.com/tvesalainen/${project.artifactId}</developerConnection>
+        <url>https://github.com/tvesalainen/${project.artifactId}</url>
+    </scm>    
+    <developers>
+        <developer>
+            <name>Timo Vesalainen</name>
+            <email>timo.vesalainen@iki.fi</email>
+            <url>https://github.com/tvesalainen</url>
+        </developer>
+    </developers>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -25,31 +50,6 @@
                 <configuration>
                     <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.github.github</groupId>
-                <artifactId>site-maven-plugin</artifactId>
-                <version>0.9</version>
-                <configuration>
-                    <message>Maven artifacts for ${project.version}</message>  <!-- git commit message -->
-                    <noJekyll>true</noJekyll>                                  <!-- disable webpage processing -->
-                    <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
-                    <branch>refs/heads/mvn-repo</branch>                       <!-- remote branch name -->
-                    <includes>
-                        <include>**/*</include>
-                    </includes>
-                    <repositoryName>GPX11</repositoryName>      	<!-- github repo name -->
-                    <repositoryOwner>tvesalainen</repositoryOwner>    <!-- github username  -->
-                </configuration>
-                <executions>
-                    <!-- run site-maven-plugin's 'site' target as part of the build's normal 'deploy' phase -->
-                    <execution>
-                        <goals>
-                            <goal>site</goal>
-                        </goals>
-                        <phase>deploy</phase>
-                    </execution>
-                </executions>
             </plugin>
             <!-- Default plugins -->
             <plugin>
@@ -70,26 +70,22 @@
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>xjc</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <packageName>org.vesalainen.jaxb.gpx</packageName> <!-- The name of your generated source package -->
+                </configuration>
+            </plugin>        
         </plugins>
     </build>
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub ${project.artifactId} Repository</name>
-            <url>https://raw.github.com/tvesalainen/${project.artifactId}/mvn-repo</url>
-        </repository>
-    </distributionManagement>
-
-
-    <repositories>
-        <repository>
-            <id>bcc-mvn-repo</id>
-            <url>https://raw.github.com/tvesalainen/bcc/mvn-repo/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-    </repositories>
-
 </project>

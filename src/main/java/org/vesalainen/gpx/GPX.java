@@ -5,12 +5,6 @@
 
 package org.vesalainen.gpx;
 
-import com.topografix.gpx._1._1.ExtensionsType;
-import com.topografix.gpx._1._1.GpxType;
-import com.topografix.gpx._1._1.ObjectFactory;
-import com.topografix.gpx._1._1.TrkType;
-import com.topografix.gpx._1._1.TrksegType;
-import com.topografix.gpx._1._1.WptType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,9 +18,13 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
+import org.vesalainen.jaxb.gpx.ExtensionsType;
+import org.vesalainen.jaxb.gpx.GpxType;
+import org.vesalainen.jaxb.gpx.ObjectFactory;
+import org.vesalainen.jaxb.gpx.TrkType;
+import org.vesalainen.jaxb.gpx.TrksegType;
+import org.vesalainen.jaxb.gpx.WptType;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * @author Timo Vesalainen
