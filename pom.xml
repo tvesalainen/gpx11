@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.vesalainen.gpx</groupId>
     <artifactId>GPX11</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <packaging>jar</packaging>
 
     <name>GPX 1.1 Helper Library</name>
