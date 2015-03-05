@@ -40,7 +40,7 @@ public class GPX
     {
         try
         {
-            jaxbCtx = JAXBContext.newInstance("com.topografix.gpx._1._1");
+            jaxbCtx = JAXBContext.newInstance("org.vesalainen.jaxb.gpx");
             factory = new ObjectFactory();
             dtFactory = DatatypeFactory.newInstance();
         }

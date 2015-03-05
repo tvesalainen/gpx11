@@ -11,7 +11,7 @@
     <version>1.0.1</version>
     <packaging>jar</packaging>
 
-    <name>GPX Helper Library</name>
+    <name>GPX 1.1 Helper Library</name>
     <description>GPX Helper Library</description>
     <url>https://github.com/tvesalainen/${project.artifactId}</url>
     <licenses>
@@ -85,4 +85,12 @@
             </plugin>        
         </plugins>
     </build>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>
