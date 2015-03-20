@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -99,7 +100,24 @@ public class GPX
             throw new IOException(ex);
         }
     }
+    /**
+     * Browse gpx file and drop aligned waypoints
+     * @param bearingTolerance If bearing is under the waypoints is considered aligned
+     * @param minDistance Waypoints closer are dropped.
+     * @param handler 
+     */
     public void browse(double bearingTolerance, double minDistance, final TrackHandler handler)
+    {
+        browse(bearingTolerance, minDistance, Double.MAX_VALUE, handler);
+    }
+    /**
+     * Browse gpx file and drop aligned waypoints
+     * @param bearingTolerance If bearing is under the waypoints is considered aligned
+     * @param minDistance Waypoints closer are dropped.
+     * @param maxSpeed Knots. If waypoints distance implies greater speed the waypoint dropped.
+     * @param handler 
+     */
+    public void browse(double bearingTolerance, double minDistance, double maxSpeed, final TrackHandler handler)
     {
         JAXBElement<GpxType> gpx1 = getGpx();
         GpxType gpxType = gpx1.getValue();
@@ -115,7 +133,7 @@ public class GPX
                 for (TrksegType tt : trksegList)
                 {
                     handler.startTrackSeq();
-                    WaypointFilter filter = new WaypointFilter(bearingTolerance, minDistance)
+                    WaypointFilter filter = new WaypointFilter(bearingTolerance, minDistance, maxSpeed)
                     {
                         @Override
                         protected void output(WptType wt)
@@ -133,6 +151,7 @@ public class GPX
                     {
                         filter.input(wt);
                     }
+                    filter.flush();
                     handler.endTrackSeq();
                 }
             }
@@ -193,20 +212,80 @@ public class GPX
                 dep*(wp1.getLon().doubleValue()-wp2.getLon().doubleValue())
                 );
     }
+    public static double speed(WptType wp1, WptType wp2)
+    {
+        double distance = distance(wp1, wp2);
+        double duration = 
+                wp2.getTime().toGregorianCalendar().getTimeInMillis()-
+                wp1.getTime().toGregorianCalendar().getTimeInMillis();
+        double hours = duration/3600000.0;
+        double speed = distance/hours;
+        return speed;
+    }
     public abstract static class WaypointFilter
     {
-        private double bearingTolerance;
-        private double minDistance;
+        private final double bearingTolerance;
+        private final double minDistance;
+        private final double maxSpeed;
         private double lastBearing = Double.NaN;
         private WptType last;
-
-        public WaypointFilter(double bearingTolerance, double minDistance)
+        private final List<WptType> buffer = new ArrayList<>();
+        /**
+         * 
+         * @param bearingTolerance
+         * @param minDistance
+         * @param maxSpeed Knots. If waypoints distance implies greater speed the waypoint dropped.
+         */
+        public WaypointFilter(double bearingTolerance, double minDistance, double maxSpeed)
         {
             this.bearingTolerance = bearingTolerance;
             this.minDistance = minDistance;
+            this.maxSpeed = maxSpeed;
         }
 
         public void input(WptType wp)
+        {
+            switch (buffer.size())
+            {
+                case 0:
+                    buffer.add(wp);
+                    break;
+                case 1:
+                    if (speed(buffer.get(0), wp) <= maxSpeed)
+                    {
+                        doInput(buffer.get(0));
+                        doInput(wp);
+                        buffer.clear();
+                    }
+                    else
+                    {
+                        buffer.add(wp);
+                    }
+                    break;
+                case 2:
+                    if (speed(buffer.get(0), wp) <= maxSpeed)
+                    {
+                        doInput(buffer.get(0));
+                        doInput(wp);
+                        buffer.clear();
+                    }
+                    else
+                    {
+                        if (speed(buffer.get(1), wp) <= maxSpeed)
+                        {
+                            doInput(buffer.get(1));
+                            doInput(wp);
+                            buffer.clear();
+                        }
+                        else
+                        {
+                            buffer.clear();
+                        }
+                    }
+                    break;
+            }
+        }
+        private void doInput(WptType wp)
         {
             if (last == null)
             {
@@ -237,6 +316,10 @@ public class GPX
             }
         }
 
+        protected void flush()
+        {
+            
+        }
         protected abstract void output(WptType wp);
         
     }
@@ -260,7 +343,7 @@ public class GPX
                 List<TrksegType> trksegList = trk.getTrkseg();
                 for (TrksegType tt : trksegList)
                 {
-                    WaypointFilter filter = new WaypointFilter(1.0, 0.1)
+                    WaypointFilter filter = new WaypointFilter(1.0, 0.1, 15)
                     {
                         @Override
                         protected void output(WptType wt)
