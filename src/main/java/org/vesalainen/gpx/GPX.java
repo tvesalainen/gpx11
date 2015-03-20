@@ -318,52 +318,14 @@ public class GPX
 
         protected void flush()
         {
-            
+            for (WptType wp : buffer)
+            {
+                doInput(wp);
+            }
         }
+        
         protected abstract void output(WptType wp);
         
     }
     
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) 
-    {
-        try
-        {
-            File f = new File("C:\\Users\\tkv\\Dropbox\\Brest - La Coruna.gpx");
-            GPX gpx = new GPX(f);
-            JAXBElement<GpxType> gpx1 = gpx.getGpx();
-            GpxType gpxType = gpx1.getValue();
-            List<TrkType> trkList = gpxType.getTrk();
-            for (TrkType trk : trkList)
-            {
-                ExtensionsType extensions = trk.getExtensions();
-                System.err.println(getText(extensions, "http://www.opencpn.org", "guid"));
-                List<TrksegType> trksegList = trk.getTrkseg();
-                for (TrksegType tt : trksegList)
-                {
-                    WaypointFilter filter = new WaypointFilter(1.0, 0.1, 15)
-                    {
-                        @Override
-                        protected void output(WptType wt)
-                        {
-                            System.err.println(wt.getLat()+" "+wt.getLon()+" "+wt.getTime());
-                        }
-                    };
-
-                    List<WptType> trkptList = tt.getTrkpt();
-                    for (WptType wt : trkptList)
-                    {
-                        filter.input(wt);
-                    }
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
-    }
-
 }
